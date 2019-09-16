@@ -17,8 +17,13 @@ public class MainActivity extends AppCompatActivity {
     private Chronometer timer;
     private boolean toggled;
     private long newBase = 0;
+    private long currentTime = 0;
+    private String startPauseText;
 
     public static final String KEY_CHRONOMETER_BASE = "chronometer base";
+    public static final String KEY_CHRONOMETER_NEWBASE = "chronometer new base";
+    public static final String KEY_CHRONOMETER_IFRUNNING = "is chronometer running";
+    public static final String KEY_CHRONOMETER_STARTPAUSEBUTTON = "what start/pause button says";
     public static final String TAG = MainActivity.class.getSimpleName();
     // Look up the Log class for Android
     // List all the levels of logging and when they're used
@@ -52,6 +57,23 @@ public class MainActivity extends AppCompatActivity {
             // pull out the value of the base that we saved from the Bundle
             // set the chronometer's base to that value
             // start the chronometer
+        if(savedInstanceState != null) {
+            currentTime = savedInstanceState.getLong(KEY_CHRONOMETER_BASE);
+            newBase = savedInstanceState.getLong(KEY_CHRONOMETER_NEWBASE);
+            toggled = savedInstanceState.getBoolean(KEY_CHRONOMETER_IFRUNNING);
+            startPauseText = savedInstanceState.getString(KEY_CHRONOMETER_STARTPAUSEBUTTON);
+
+            if(toggled) {
+                timer.setBase(SystemClock.uptimeMillis() - newBase);
+                startPause.setText(getString(R.string.main_pause));
+                toggled = true;
+            }
+            else {
+                timer.setBase(SystemClock.uptimeMillis() - newBase);
+                startPause.setText(getString(R.string.main_start));
+                toggled = false;
+            }
+        }
 
         // next functionality would be to also store in the bundle
         // whether it was running or stopped to decide if you should
@@ -79,13 +101,16 @@ public class MainActivity extends AppCompatActivity {
 
                     timer.start();
                     startPause.setText(getString(R.string.main_pause));
+                    startPauseText = startPause.getText().toString(); // added
                     toggled = true;
                 }
                 else {
                     timer.stop();
                     startPause.setText(getString(R.string.main_start));
+                    startPauseText = startPause.getText().toString(); // added
                     toggled = false;
 
+                    currentTime = timer.getBase(); // added
                     newBase = SystemClock.uptimeMillis() - timer.getBase();
                 }
             }
@@ -99,6 +124,8 @@ public class MainActivity extends AppCompatActivity {
                 toggled = false;
 
                 timer.setBase(SystemClock.elapsedRealtime());
+                currentTime = timer.getBase(); // added
+                newBase = SystemClock.elapsedRealtime() - timer.getBase();
             }
         });
     }
@@ -137,6 +164,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong(KEY_CHRONOMETER_BASE, timer.getBase());
+        outState.putLong(KEY_CHRONOMETER_BASE, currentTime);
+        outState.putLong(KEY_CHRONOMETER_NEWBASE, newBase);
+        outState.putBoolean(KEY_CHRONOMETER_IFRUNNING, toggled);
+        outState.putString(KEY_CHRONOMETER_STARTPAUSEBUTTON, startPauseText);
     }
 }
