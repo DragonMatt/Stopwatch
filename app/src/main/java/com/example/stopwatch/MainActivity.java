@@ -64,12 +64,15 @@ public class MainActivity extends AppCompatActivity {
             startPauseText = savedInstanceState.getString(KEY_CHRONOMETER_STARTPAUSEBUTTON);
 
             if(toggled) {
-                timer.setBase(SystemClock.uptimeMillis() - newBase);
+                timer.setBase(currentTime - newBase);
+
+                timer.start();
                 startPause.setText(getString(R.string.main_pause));
                 toggled = true;
             }
             else {
                 timer.setBase(SystemClock.uptimeMillis() - newBase);
+
                 startPause.setText(getString(R.string.main_start));
                 toggled = false;
             }
@@ -97,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if(!toggled)
                 {
-                    timer.setBase(SystemClock.uptimeMillis() - newBase);
+                    timer.setBase(currentTime - newBase);
 
                     timer.start();
                     startPause.setText(getString(R.string.main_pause));
@@ -110,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
                     startPauseText = startPause.getText().toString(); // added
                     toggled = false;
 
-                    currentTime = timer.getBase(); // added
+                    currentTime = SystemClock.uptimeMillis(); // added
                     newBase = SystemClock.uptimeMillis() - timer.getBase();
                 }
             }
@@ -124,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                 toggled = false;
 
                 timer.setBase(SystemClock.elapsedRealtime());
-                currentTime = timer.getBase(); // added
+                currentTime = SystemClock.uptimeMillis(); // added
                 newBase = SystemClock.elapsedRealtime() - timer.getBase();
             }
         });
